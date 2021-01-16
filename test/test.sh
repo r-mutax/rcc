@@ -18,6 +18,6 @@ assert(){
 }
 
 assert 0 0
-assert 41 " 12 + 34 - 5 "
+assert 9 '(3+5*( 9 - 6 ))   /2'
 
 echo OK

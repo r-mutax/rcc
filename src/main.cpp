@@ -2,6 +2,8 @@
 
 #include <pr_assm.h>
 #include <tokenize.h>
+#include <parsing.h>
+#include <generator.h>
 #include <errmsg.h>
 
 int main(int argc, char **argv){
@@ -13,21 +15,14 @@ int main(int argc, char **argv){
 
     reg_user_input(argv[1]);
     tk_tokenize(argv[1]);
+    Node* node = expr();
 
     pa_headder();
     printf("main:\n");
-    printf("    mov rax, %d\n", tk_expect_number());
 
-    while(!tk_at_eof()) {
-        if(tk_consume('+')) {
-            printf("    add rax, %d\n", tk_expect_number());
-            continue;
-        }
+    gen(node);
 
-        tk_expect('-');
-        printf("    sub rax, %d\n", tk_expect_number());
-    }
-
+    pa_pop("rax");
     printf("    ret\n");
 
     return 0;
