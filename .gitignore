@@ -1,0 +1,6 @@
+bin/rcc
+bin/*~
+load/*.o
+load/*.d
+test/*.s
+test/tmp
