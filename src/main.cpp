@@ -1,6 +1,7 @@
 #include <rcc.h>
 
 #include <pr_assm.h>
+#include <tokenize.h>
 
 int main(int argc, char **argv){
 
@@ -9,27 +10,20 @@ int main(int argc, char **argv){
         return 1;
     }
 
-    char *p = argv[1];
+    tk_tokenize(argv[1]);
 
     pa_headder();
     printf("main:\n");
-    printf("    mov rax, %ld\n", strtol(p, &p, 10));
+    printf("    mov rax, %d\n", tk_expect_number());
 
-    while(*p) {
-        if(*p == '+') {
-            p++;
-            printf("    add rax, %ld\n", strtol(p, &p, 10));
+    while(!tk_at_eof()) {
+        if(tk_consume('+')) {
+            printf("    add rax, %d\n", tk_expect_number());
             continue;
         }
 
-        if(*p == '-') {
-            p++;
-            printf("    sub rax, %ld\n", strtol(p, &p, 10));
-            continue;
-        }
-
-        fprintf(stderr, "予期しない文字です：　'%c'\n", *p);
-        return 1;
+        tk_expect('-');
+        printf("    sub rax, %d\n", tk_expect_number());
     }
 
     printf("    ret\n");

@@ -24,7 +24,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 clean:
 	-rm -f $(OBJECTS) $(DEPENDS) $(TARGET)
 
-test: test
+test: ./bin/rcc
 	./test/test.sh
 
 .PHONY: test clean
