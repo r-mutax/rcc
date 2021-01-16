@@ -2,6 +2,7 @@
 
 #include <pr_assm.h>
 #include <tokenize.h>
+#include <errmsg.h>
 
 int main(int argc, char **argv){
 
@@ -10,6 +11,7 @@ int main(int argc, char **argv){
         return 1;
     }
 
+    reg_user_input(argv[1]);
     tk_tokenize(argv[1]);
 
     pa_headder();

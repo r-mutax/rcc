@@ -35,7 +35,7 @@ void tk_tokenize(char *p){
             continue;
         }
 
-        error("トークナイズできません");
+        error_at(token->str, "トークナイズできません");
     }
 
     new_token(TK_EOF, cur, p);
@@ -64,14 +64,14 @@ bool tk_consume(char op){
 
 void tk_expect(char op){
     if(token->kind != TK_RESERVED || token->str[0] != op)
-        error("'%c'ではありません。", op);
+        error_at(token->str, "'%c'ではありません。", op);
 
     token = token->next;
 }
 
 int tk_expect_number(){
     if(token->kind != TK_NUM)
-        error("数値ではありません");
+        error_at(token->str, "数値ではありません");
 
     int val = token->val;
     token = token->next;
