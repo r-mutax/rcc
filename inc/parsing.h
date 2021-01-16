@@ -7,7 +7,7 @@ typedef enum {
     ND_SUB,
     ND_MUL,
     ND_DIV,
-    ND_NUM
+    ND_NUM,
 } NodeKind;
 
 typedef struct Node {

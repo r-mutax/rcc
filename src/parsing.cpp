@@ -7,6 +7,7 @@ Node* new_node(int val);
 
 Node* mul();
 Node* primary();
+Node* unary();
 
 // expr = mul ( "+" mul | "-" mul )*
 Node* expr(){
@@ -22,20 +23,35 @@ Node* expr(){
     }
 }
 
-// mul = primary ( "*" primary | "/" primary )*
+// mul = primary ( "*" unary | "/" unary )*
 Node* mul(){
-    Node* node = primary();
+    Node* node = unary();
 
     for(;;){
         if(tk_consume('*'))
-            node = new_node(ND_MUL, node, primary());
+            node = new_node(ND_MUL, node, unary());
         else if(tk_consume('/'))
-            node = new_node(ND_DIV, node, primary());
+            node = new_node(ND_DIV, node, unary());
         else
             return node;        
     }
 }
 
+// unary = ("+" | "-")? primary
+Node* unary(){
+    if(tk_consume('+')){
+        return primary();
+    }
+
+    if(tk_consume('-')){
+        Node* node = new_node(ND_SUB, new_node(0), primary());
+        return node;
+    }
+
+    return primary();
+}
+
+// primary = num | ("(" expr ")")
 Node* primary(){
     if(tk_consume('(')){
         Node* node = expr();
