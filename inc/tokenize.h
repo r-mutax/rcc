@@ -14,12 +14,13 @@ typedef struct Token {
     Token   *next;
     int val;
     char *str;
+    int len;
 } Token;
 
 
 // 汎用関数
-bool tk_consume(char op);
-void tk_expect(char op);
+bool tk_consume(const char* op);
+void tk_expect(const char* op);
 int tk_expect_number();
 bool tk_at_eof();
 void tk_tokenize(char *p);

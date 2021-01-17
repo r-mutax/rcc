@@ -20,5 +20,6 @@ assert(){
 assert 0 0
 assert 9 '(3+5*( 9 - 6 ))   /2'
 assert 20 '(-10 + 20) * 2'
+assert 1 '(1 + 2 == 3) == 1'
 
 echo OK

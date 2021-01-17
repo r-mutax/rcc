@@ -5,18 +5,58 @@
 Node* new_node(NodeKind kind, Node* lhs, Node* rhs);
 Node* new_node(int val);
 
+Node* equality();
+Node* relational();
+Node* add();
 Node* mul();
 Node* primary();
 Node* unary();
 
-// expr = mul ( "+" mul | "-" mul )*
+// expr = equality()
 Node* expr(){
+    return equality();
+}
+
+// equality = relational ( "==" relational | "!=" relational )*
+Node* equality(){
+    Node* node = relational();
+
+    for(;;){
+        if(tk_consume("=="))
+            node = new_node(ND_EQ, node, relational());
+        else if(tk_consume("!="))
+            node = new_node(ND_NE, node, relational());
+        else
+            return node;
+    }
+}
+
+// relational = add ( "<" add | "<=" add)*
+Node* relational(){
+    Node* node = add();
+
+    for(;;){
+        if(tk_consume("<"))
+            node = new_node(ND_LT, node, add());
+        else if(tk_consume("<="))
+            node = new_node(ND_LE, node, add());
+        else if(tk_consume(">"))
+            node = new_node(ND_LT, add(), node);
+        else if(tk_consume(">="))
+            node = new_node(ND_LE, add(), node);
+        else
+            return node;
+    }
+}
+
+// add = mul ( "+" mul | "-" mul )*
+Node* add(){
     Node* node = mul();
 
     for(;;){
-        if(tk_consume('+'))
+        if(tk_consume("+"))
             node = new_node(ND_ADD, node, mul());
-        else if (tk_consume('-'))
+        else if (tk_consume("-"))
             node = new_node(ND_SUB, node, mul());
         else
             return node;
@@ -28,9 +68,9 @@ Node* mul(){
     Node* node = unary();
 
     for(;;){
-        if(tk_consume('*'))
+        if(tk_consume("*"))
             node = new_node(ND_MUL, node, unary());
-        else if(tk_consume('/'))
+        else if(tk_consume("/"))
             node = new_node(ND_DIV, node, unary());
         else
             return node;        
@@ -39,11 +79,11 @@ Node* mul(){
 
 // unary = ("+" | "-")? primary
 Node* unary(){
-    if(tk_consume('+')){
+    if(tk_consume("+")){
         return primary();
     }
 
-    if(tk_consume('-')){
+    if(tk_consume("-")){
         Node* node = new_node(ND_SUB, new_node(0), primary());
         return node;
     }
@@ -53,9 +93,9 @@ Node* unary(){
 
 // primary = num | ("(" expr ")")
 Node* primary(){
-    if(tk_consume('(')){
+    if(tk_consume("(")){
         Node* node = expr();
-        tk_expect(')');
+        tk_expect(")");
         return node;
     }
 
