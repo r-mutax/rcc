@@ -17,9 +17,12 @@ assert(){
     fi
 }
 
-assert 0 0
-assert 9 '(3+5*( 9 - 6 ))   /2'
-assert 20 '(-10 + 20) * 2'
-assert 1 '(1 + 2 == 3) == 1'
+assert 0 '0;'
+assert 9 '(3+5*( 9 - 6 ))   /2;'
+assert 20 '(-10 + 20) * 2;'
+assert 1 '(1 + 2 == 3) == 1;'
+assert 1 '2 > (1 * 3) - 2;'
+assert 0 '3 <= 4 * 4 * (2 - 3);'
+assert 6 'a = 5 + 4; a - 3;'
 
 echo OK

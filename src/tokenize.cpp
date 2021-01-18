@@ -19,6 +19,7 @@ void tk_tokenize(char *p){
     Token* cur = &head;
 
     while(*p) {
+        // fprintf(stderr, "%c", *p);   // debug
         if (isspace(*p)) {
             p++;
             continue;
@@ -31,9 +32,13 @@ void tk_tokenize(char *p){
             continue;
         }
 
-
-        if (strchr("+-*/()<>", *p)){
+        if (strchr("+-*/()<>;=", *p)){
             cur = new_token(TK_RESERVED, cur, p++, 1);
+            continue;
+        }
+
+        if ('a' <= *p && *p <= 'z'){
+            cur = new_token(TK_IDENT, cur, p++, 1);
             continue;
         }
 
@@ -73,6 +78,16 @@ bool tk_consume(const char* op){
     
     token = token->next;
     return true;
+}
+
+Token* tk_consume_ident(){
+    if(token->kind != TK_IDENT){
+        return NULL;
+    }
+
+    Token* tok = token;
+    token = token->next;
+    return tok;
 }
 
 void tk_expect(const char* op){

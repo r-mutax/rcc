@@ -1,7 +1,6 @@
 #ifndef PARSING
 #define PARSING
 
-
 typedef enum {
     ND_ADD,
     ND_SUB,
@@ -12,6 +11,8 @@ typedef enum {
     ND_NE,      // !=
     ND_LT,      // <
     ND_LE,      // >
+    ND_ASSIGN,  // 代入式
+    ND_LVAR,    // ローカル変数
 } NodeKind;
 
 typedef struct Node {
@@ -19,9 +20,10 @@ typedef struct Node {
     Node*       lhs;
     Node*       rhs;
     int         val;
+    int         offset;
 } Node;
 
-
-Node* expr();
+void program();
+Node** pr_getNode();
 
 #endif
