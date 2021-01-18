@@ -6,4 +6,4 @@
 詰まった場合は遠慮なくリポジトリを見ちゃうことにしてます。
 
 # 参考リンク
-(https://www.sigbus.info/compilerboo)
+(https://www.sigbus.info/compilerbook)
