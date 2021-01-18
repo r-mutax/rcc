@@ -18,6 +18,13 @@ typedef struct Token {
     int len;
 } Token;
 
+// 識別子リスト
+typedef struct LVar {
+    LVar* next;     // 次の識別子
+    char* name;     // 名前
+    int len;        // 名前の長さ
+    int offset;     // RBPからのオフセット
+} LVar;
 
 // 汎用関数
 bool tk_consume(const char* op);

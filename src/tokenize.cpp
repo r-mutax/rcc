@@ -9,6 +9,8 @@ struct Token *token;
 // ===================
 Token *new_token(TokenKind kind, Token *cur, char *str, int len);
 bool startswith(char* p, const char* q);
+static bool is_ident1(char c);
+static bool is_ident2(char c);
 
 // ===================
 // func implement
@@ -25,6 +27,17 @@ void tk_tokenize(char *p){
             continue;
         }
 
+        if(is_ident1(*p)){
+            char *st = p;
+            // is_ident2がfalseになるまでポインタを進める。
+            do{
+                fprintf(stderr, "%c", *p);
+                p++;
+            } while(is_ident2(*p));
+            cur = cur->next = new_token(TK_IDENT, cur, st, abs(p - st + 1));
+            continue;
+        }
+        
         if(startswith(p, "==") || startswith(p, "!=")||
         startswith(p, "<=") || startswith(p, ">=")){
             cur = new_token(TK_RESERVED, cur, p, 2);
@@ -114,4 +127,11 @@ bool tk_at_eof(){
 
 bool startswith(char* p, const char* q){
     return memcmp(p, q, strlen(q)) == 0;
+}
+
+static bool is_ident1(char c) {
+  return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
+}
+static bool is_ident2(char c) {
+  return is_ident1(c) || ('0' <= c && c <= '9');
 }

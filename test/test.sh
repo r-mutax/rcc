@@ -23,6 +23,6 @@ assert 20 '(-10 + 20) * 2;'
 assert 1 '(1 + 2 == 3) == 1;'
 assert 1 '2 > (1 * 3) - 2;'
 assert 0 '3 <= 4 * 4 * (2 - 3);'
-assert 6 'a = 5 + 4; a - 3;'
+assert 6 'aaaaaa= 5 + 4; a - 3;'
 
 echo OK
