@@ -4,7 +4,6 @@
 #include <tokenize.h>
 #include <parsing.h>
 #include <generator.h>
-#include <errmsg.h>
 
 // grobal buffer
 extern Node* code[100];

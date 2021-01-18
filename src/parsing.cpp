@@ -1,6 +1,6 @@
-#include <parsing.h>
-#include <tokenize.h>
-#include <rcc.h>
+
+#include "parsing.h"
+#include "tokenize.h"
 
 // local
 Node* new_node(NodeKind kind, Node* lhs, Node* rhs);
