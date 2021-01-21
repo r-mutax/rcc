@@ -3,7 +3,9 @@
 
 #include <rcc.h>
 
-void program();
+
+Function* program();
 Node** pr_getNode();
+
 
 #endif

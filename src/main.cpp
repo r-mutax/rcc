@@ -17,26 +17,10 @@ int main(int argc, char **argv){
 
     reg_user_input(argv[1]);
     tk_tokenize(argv[1]);
-    program();
 
-    pa_headder();
-    printf("main:\n");
+    Function* func = program();
 
-    // 変数26個分の領域を確保しておく
-    printf("    push rbp\n");
-    printf("    mov rbp, rsp\n");
-    printf("    sub rsp, 208\n");
-
-
-    for(int i = 0; code[i]; i++){
-        gen(code[i]);
-
-        printf("    pop rax\n");
-    }
-
-    printf("    mov rsp, rbp\n");
-    printf("    pop rbp\n");
-    printf("    ret\n");
+    funcgen(func);
 
     return 0;
 }

@@ -17,17 +17,36 @@ Node* mul();
 Node* primary();
 Node* unary();
 
+LVar* find_lvar(Token* tok);
+
 // grobal buffer
-Node* code[100];
+LVar* locals;
 
 // program = stmt*
-void program(){
-    int i = 0;
+// ひとまず入力全体で一つのmain関数としてコンパイルする。
+Function* program(){
+    Node head = {};
+    Node* cur = &head;
 
+    locals = nullptr;
+    // ここではnodeを数珠つなぎにしていく
     while(!tk_at_eof()){
-        code[i++] = stmt();
+        cur->next = stmt();
+        cur = cur->next;
     }
-    code[i] = NULL;
+
+    Function* func = (Function*) calloc(1, sizeof(Function));
+    // bodyから伸びるnodeのチェーンが関数のstmtの並びになっている。
+    func->body = head.next;
+    func->locals = locals;
+
+    // stack_sizeの計算
+    if(func->locals != NULL){
+        // locals != NULLのときはローカル変数がある。
+        func->stack_size = locals->offset;
+    }
+
+    return func;
 }
 
 // stmt = expr ';'
@@ -134,10 +153,30 @@ Node* primary(){
         return node;
     }
 
+    // 識別子トークンだった場合
     Token* tok = tk_consume_ident();
     if(tok){
+        // 現時点では変数だけ
         Node* node = (Node*)calloc(1, sizeof(Node));
         node->kind = ND_LVAR;
+
+        // localsにすでに登録済の変数か？
+        LVar* lvar = find_lvar(tok);
+        if(lvar){
+            // 登録済の場合
+            node->offset = lvar->offset;
+        } else {
+            // 初検出ならLVarを追加する
+            lvar = (LVar*)calloc(1, sizeof(LVar));
+
+            // localsが一番最後の変数になることに注意！
+            lvar->next = locals;
+            lvar->name = tok->str;
+            lvar->len = tok->len;
+            lvar->offset = locals->offset + 8;
+            node->offset = lvar->offset;
+            locals = lvar;
+        }
         node->offset = (tok->str[0] - 'a' + 1) * 8;
         return node;
     }
@@ -160,6 +199,16 @@ Node* new_node(int val){
     return node;
 }
 
-Node** getNode(){
-    return code;
+
+LVar* find_lvar(Token* tok){
+    if(locals == nullptr){
+        locals = (LVar*)calloc(1, sizeof(LVar));
+    }
+
+    for(LVar *var = locals; var; var = var->next){
+        if(var->len == tok->len && !memcmp(tok->str, var->name, var->len)){
+            return var;
+        }
+    }
+    return NULL;
 }

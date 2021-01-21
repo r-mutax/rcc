@@ -3,6 +3,31 @@
 
 void gen_lval(Node* node);
 
+void funcgen(Function* func){
+
+    printf(".intel_syntax noprefix\n");
+    printf(".global main\n");
+    printf("main:\n");
+
+    // prologue
+    printf("    push rbp\n");
+    printf("    mov rbp, rsp\n");
+    printf("    sub rsp, %d\n", func->stack_size);
+
+    for(Node* node = func->body; node; node = node->next){
+        gen(node);
+        printf("    pop rax\n");
+    }
+
+    // epilogue
+    printf(".L.return:\n");
+    printf("    mov rsp, rbp\n");
+    printf("    pop rbp\n");
+    printf("    ret\n");    
+}
+
+
+// 最後に答えを突っ込む
 void gen(Node* node){
     switch(node->kind){
         case ND_NUM:

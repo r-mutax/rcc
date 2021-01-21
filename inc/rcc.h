@@ -32,14 +32,6 @@ typedef struct Token {
     int len;
 } Token;
 
-// 識別子リスト
-typedef struct LVar {
-    LVar* next;     // 次の識別子
-    char* name;     // 名前
-    int len;        // 名前の長さ
-    int offset;     // RBPからのオフセット
-} LVar;
-
 // ===============================
 //  parser
 // ===============================
@@ -59,10 +51,26 @@ typedef enum {
 
 typedef struct Node {
     NodeKind    kind;
+    Node*       next;   // 次のstmtの内容
+
     Node*       lhs;
     Node*       rhs;
     int         val;
     int         offset;
 } Node;
+
+// 識別子リスト
+typedef struct LVar {
+    LVar* next;     // 次の識別子
+    char* name;     // 名前
+    int len;        // 名前の長さ
+    int offset;     // RBPからのオフセット
+} LVar;
+
+typedef struct Function {
+    Node* body;
+    LVar* locals;
+    int stack_size;
+} Function;
 
 #endif

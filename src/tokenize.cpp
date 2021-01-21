@@ -20,7 +20,6 @@ void tk_tokenize(char *p){
     Token* cur = &head;
 
     while(*p) {
-        // fprintf(stderr, "%c", *p);   // debug
         if (isspace(*p)) {
             p++;
             continue;
@@ -30,10 +29,10 @@ void tk_tokenize(char *p){
             char *st = p;
             // is_ident2がfalseになるまでポインタを進める。
             do{
-                fprintf(stderr, "%c", *p);
+                //fprintf(stderr, "%c", *p);
                 p++;
             } while(is_ident2(*p));
-            cur = cur->next = new_token(TK_IDENT, cur, st, abs(p - st + 1));
+            cur = cur->next = new_token(TK_IDENT, cur, st, abs(p - st));
             continue;
         }
         
