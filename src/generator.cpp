@@ -16,7 +16,6 @@ void funcgen(Function* func){
 
     for(Node* node = func->body; node; node = node->next){
         gen(node);
-        printf("    pop rax\n");
     }
 
     // epilogue
@@ -29,7 +28,12 @@ void funcgen(Function* func){
 
 // 最後に答えを突っ込む
 void gen(Node* node){
+    
     switch(node->kind){
+        case ND_RETURN:
+            gen(node->lhs);
+            printf("    pop rax\n");
+            return;
         case ND_NUM:
             pa_push(node->val);
             return;
@@ -53,11 +57,6 @@ void gen(Node* node){
             return;
     }
 
-
-    if(node->kind == ND_NUM){
-        pa_push(node->val);
-        return;
-    }
 
     gen(node->lhs);
     gen(node->rhs);

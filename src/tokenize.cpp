@@ -10,7 +10,7 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int len);
 bool startswith(char* p, const char* q);
 static bool is_ident1(char c);
 static bool is_ident2(char c);
-
+static bool is_alnum(char c);
 // ===================
 // func implement
 // ===================
@@ -22,6 +22,12 @@ void tk_tokenize(char *p){
     while(*p) {
         if (isspace(*p)) {
             p++;
+            continue;
+        }
+
+        if(strncmp(p, "return", 6) == 0 && !is_alnum(p[6])){
+            cur = new_token(TK_RETURN, cur, p, 6);
+            p += 6;
             continue;
         }
 
@@ -91,6 +97,15 @@ bool tk_consume(const char* op){
     return true;
 }
 
+bool tk_consume(TokenKind kind){
+    if(token->kind == kind){
+        token = token->next;
+        return true;
+    }
+
+    return false;
+}
+
 Token* tk_consume_ident(){
     if(token->kind != TK_IDENT){
         return NULL;
@@ -132,4 +147,8 @@ static bool is_ident1(char c) {
 }
 static bool is_ident2(char c) {
   return is_ident1(c) || ('0' <= c && c <= '9');
+}
+
+static bool is_alnum(char c) {
+    return is_ident2(c);
 }

@@ -49,9 +49,18 @@ Function* program(){
     return func;
 }
 
-// stmt = expr ';'
+// stmt = expr ';' | 'return' expr
 Node* stmt(){
-    Node* node = expr();
+    Node* node;
+
+    if(tk_consume(TK_RETURN)){
+        node = (Node*)calloc(1, sizeof(Node));
+        node->kind = ND_RETURN;
+        node->lhs = expr();
+    } else {
+        node = expr();
+    }
+
     tk_expect(";");
     return node;
 }
