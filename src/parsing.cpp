@@ -1,6 +1,7 @@
 
 #include "parsing.h"
 #include "tokenize.h"
+#include "ident_manager.h"
 
 // local
 Node* new_node(NodeKind kind, Node* lhs, Node* rhs);
@@ -17,10 +18,6 @@ Node* mul();
 Node* primary();
 Node* unary();
 
-LVar* find_lvar(Token* tok);
-
-// grobal buffer
-LVar* locals;
 
 // program = stmt*
 // ひとまず入力全体で一つのmain関数としてコンパイルする。
@@ -28,7 +25,9 @@ Function* program(){
     Node head = {};
     Node* cur = &head;
 
-    locals = nullptr;
+    // 新しい関数スコープを作る
+    id_begin_scope(SC_FUNC);
+
     // ここではnodeを数珠つなぎにしていく
     while(!tk_at_eof()){
         cur->next = stmt();
@@ -38,13 +37,12 @@ Function* program(){
     Function* func = (Function*) calloc(1, sizeof(Function));
     // bodyから伸びるnodeのチェーンが関数のstmtの並びになっている。
     func->body = head.next;
-    func->locals = locals;
 
     // stack_sizeの計算
-    if(func->locals != NULL){
-        // locals != NULLのときはローカル変数がある。
-        func->stack_size = locals->offset;
-    }
+    func->stack_size = id_get_curfunc_stack_size();
+
+    // スコープを抜ける
+    id_end_scope();
 
     return func;
 }
@@ -169,24 +167,14 @@ Node* primary(){
         Node* node = (Node*)calloc(1, sizeof(Node));
         node->kind = ND_LVAR;
 
-        // localsにすでに登録済の変数か？
-        LVar* lvar = find_lvar(tok);
-        if(lvar){
-            // 登録済の場合
-            node->offset = lvar->offset;
-        } else {
-            // 初検出ならLVarを追加する
-            lvar = (LVar*)calloc(1, sizeof(LVar));
+        Ident* ident = id_find_ident(tok);
 
-            // localsが一番最後の変数になることに注意！
-            lvar->next = locals;
-            lvar->name = tok->str;
-            lvar->len = tok->len;
-            lvar->offset = locals->offset + 8;
-            node->offset = lvar->offset;
-            locals = lvar;
+        if(ident){
+            node->offset = ident->offset;
+        } else {
+            ident = id_declare_lvar(tok);
+            node->offset = ident->offset;
         }
-        node->offset = (tok->str[0] - 'a' + 1) * 8;
         return node;
     }
 
@@ -206,18 +194,4 @@ Node* new_node(int val){
     node->kind = ND_NUM;
     node->val = val;
     return node;
-}
-
-
-LVar* find_lvar(Token* tok){
-    if(locals == nullptr){
-        locals = (LVar*)calloc(1, sizeof(LVar));
-    }
-
-    for(LVar *var = locals; var; var = var->next){
-        if(var->len == tok->len && !memcmp(tok->str, var->name, var->len)){
-            return var;
-        }
-    }
-    return NULL;
 }

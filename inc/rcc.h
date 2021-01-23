@@ -62,17 +62,37 @@ typedef struct Node {
 } Node;
 
 // 識別子リスト
-typedef struct LVar {
-    LVar* next;     // 次の識別子
-    char* name;     // 名前
-    int len;        // 名前の長さ
-    int offset;     // RBPからのオフセット
-} LVar;
 
 typedef struct Function {
     Node* body;
-    LVar* locals;
     int stack_size;
 } Function;
+
+
+typedef enum {
+    IDENT_FUNC,
+    IDENT_LVAL,
+} IdentType;
+
+typedef struct Ident {
+    IdentType   type;
+    Ident*      next;
+    char*       name;
+    int         len;
+    int         offset;
+} Ident;
+
+typedef enum {
+    SC_GROBAL = 0,  // グローバルスコープ
+    SC_FUNC,        // 関数スコープ
+    SC_BLOCK,       // ブロックスコープ
+} ScopeType;
+
+typedef struct IdentScope{
+    Ident*          idents;     // scope内で定義された識別子
+    IdentScope*     parent;     // 親スコープへのポインタ
+    ScopeType       type;       // スコープのタイプ
+    int             stacksize;  // スコープで使うスタックのサイズ: SC_FUNCのときだけ使う
+} IdentScope;
 
 #endif
