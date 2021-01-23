@@ -33,20 +33,6 @@ void id_end_scope(){
     return;
 }
 
-// 現在のスコープ内で定義されている変数の数を調べる。
-// -> 関数のスタックサイズを見るようにしたからいらない
-int id_get_lvar_num(){
-    int lvar_num = 0;
-    
-    for(Ident* ident = sc_cur->idents; ident; ident = ident->next){
-        if(ident->type == IDENT_LVAL){
-            lvar_num += 1;
-        }
-    }
-
-    return lvar_num;
-}
-
 // 変数宣言を、現在のスコープの変数リストに追加する。
 Ident* id_declare_lvar(Token* tok){
     Ident* ident = (Ident*) calloc(1,sizeof(Ident));
