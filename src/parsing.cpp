@@ -8,6 +8,7 @@ Node* new_node(NodeKind kind, Node* lhs, Node* rhs);
 Node* new_node(int val);
 
 // grammer
+Node* compound_stmt();
 Node* stmt();
 Node* expr();
 Node* assign();
@@ -47,6 +48,22 @@ Function* program(){
     return func;
 }
 
+// compound_stmt = stmt* "}"
+Node* compound_stmt(){
+
+    Node head = {};
+    Node* cur = &head;
+
+    while(!tk_consume("}")){
+        cur = cur->next = stmt();
+    }
+
+    Node* node = (Node*)calloc(1, sizeof(Node));
+    node->kind = ND_BLOCK;
+    node->body = head.next;
+    return node;
+}
+
 // stmt = expr ';' | 'return' expr
 Node* stmt(){
     Node* node;
@@ -55,6 +72,8 @@ Node* stmt(){
         node = (Node*)calloc(1, sizeof(Node));
         node->kind = ND_RETURN;
         node->lhs = expr();
+    } else if(tk_consume("{")){
+        return compound_stmt();
     } else {
         node = expr();
     }

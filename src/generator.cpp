@@ -55,6 +55,15 @@ void gen(Node* node){
             printf("    mov [rax], rdi\n");     // mov <-方向に
             printf("    push rdi\n");
             return;
+        case ND_BLOCK:
+        {
+            Node* cur = node->body;
+            while(cur){
+                gen(cur);
+                cur = cur->next;
+            }
+            return;
+        }
     }
 
 

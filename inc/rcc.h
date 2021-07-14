@@ -49,6 +49,7 @@ typedef enum {
     ND_ASSIGN,  // 代入式
     ND_LVAR,    // ローカル変数
     ND_RETURN,  // return
+    ND_BLOCK,   // ブロック
 } NodeKind;
 
 typedef struct Node {
@@ -57,6 +58,7 @@ typedef struct Node {
 
     Node*       lhs;
     Node*       rhs;
+    Node*       body;   // body
     int         val;
     int         offset;
 } Node;

@@ -12,12 +12,6 @@ IdentScope      *sc_cur = &global_scope;
 // ------------------------------
 static IdentScope* lid_get_func_scope();
 
-
-// find_ident(LVAR | FUNC_NAME)
-// registore_ident(LVAR | FUNC_NAME)
-// make_namespace
-    // level : grobal , local
-
 // スコープに入る
 void id_begin_scope(ScopeType type){
     IdentScope*     iscope = (IdentScope*)calloc(1, sizeof(IdentScope));
