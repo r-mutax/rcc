@@ -1,8 +1,11 @@
 #include <generator.h>
 #include <pr_assm.h>
 
-void gen_lval(Node* node);
+static void gen_lval(Node* node);
+static void gen_compound_stmt(Node* node);
+static void gen_stmt(Node* node);
 
+// function generator
 void funcgen(Function* func){
 
     printf(".intel_syntax noprefix\n");
@@ -14,9 +17,8 @@ void funcgen(Function* func){
     printf("    mov rbp, rsp\n");
     printf("    sub rsp, %d\n", func->stack_size);
 
-    for(Node* node = func->body; node; node = node->next){
-        gen(node);
-    }
+    // all the stmt is include by compound stmt.
+    gen_compound_stmt(func->body);
 
     // epilogue
     printf(".L.return:\n");
@@ -25,15 +27,43 @@ void funcgen(Function* func){
     printf("    ret\n");    
 }
 
+// generator of compound stmt
+static void gen_compound_stmt(Node* node)
+{
+    switch(node->kind){
+        case ND_BLOCK:
+            for(Node* cur = node->body; cur; cur = cur->next){
+                gen_stmt(cur);
+            }
+        return;
+    }
+}
 
-// 最後に答えを突っ込む
-void gen(Node* node){
-    
+// generator of stmt(return, block, other expr -> gen())
+static void gen_stmt(Node* node){
     switch(node->kind){
         case ND_RETURN:
             gen(node->lhs);
             printf("    pop rax\n");
+            printf("    jmp .L.return\n");
             return;
+        case ND_BLOCK:
+            // blockの中にblockが来たとき
+            gen_compound_stmt(node);
+            break;
+        default:
+            gen(node);
+            break;
+    }
+}
+
+// assembly generator
+// ----------------------
+// end of this func, stored to stack rax register
+void gen(Node* node){
+    
+    // if primary immidiate return.
+    switch(node->kind){
         case ND_NUM:
             pa_push(node->val);
             return;
@@ -55,24 +85,17 @@ void gen(Node* node){
             printf("    mov [rax], rdi\n");     // mov <-方向に
             printf("    push rdi\n");
             return;
-        case ND_BLOCK:
-        {
-            Node* cur = node->body;
-            while(cur){
-                gen(cur);
-                cur = cur->next;
-            }
-            return;
-        }
     }
 
-
+    // right side ans left side assemble each. 
     gen(node->lhs);
     gen(node->rhs);
 
+    // pop lhs and rhs
     pa_pop("rdi");
     pa_pop("rax");
 
+    // calculate and store result to stack top.
     switch(node->kind){
         case ND_ADD:
             printf("    add rax, rdi\n");
@@ -112,6 +135,7 @@ void gen(Node* node){
     printf("    push rax\n");
 }
 
+// generate value address in stack
 void gen_lval(Node* node){
     if(node->kind != ND_LVAR){
         error("代入の左辺値が変数ではありません！");
