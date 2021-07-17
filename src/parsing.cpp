@@ -229,6 +229,19 @@ Node* primary(){
     // 識別子トークンだった場合
     Token* tok = tk_consume_ident();
     if(tok){
+        if(tk_consume("(")){
+            // func call
+            tk_consume(")");
+
+            Node* node = (Node*)calloc(1, sizeof(Node));
+            node->kind = ND_FUNC_CALL;
+            node->func = (char*)malloc(tok->len + 1);
+
+            memcpy(node->func, tok->str, tok->len);
+            node->func[tok->len] = '\0';
+            return node;
+        }
+
         // 現時点では変数だけ
         Node* node = (Node*)calloc(1, sizeof(Node));
         node->kind = ND_LVAR;

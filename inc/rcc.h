@@ -57,6 +57,7 @@ typedef enum {
     ND_IF,      // if
     ND_WHILE,   // while
     ND_FOR,     // for
+    ND_FUNC_CALL,   // func calling
 } NodeKind;
 
 typedef struct Node {
@@ -73,6 +74,9 @@ typedef struct Node {
     Node*       cond;
     Node*       then;
     Node*       els;
+
+    char*       func;
+    int         len;
     
     int         val;
     int         offset;

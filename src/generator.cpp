@@ -122,6 +122,10 @@ void gen(Node* node){
         case ND_NUM:
             pa_push(node->val);
             return;
+        case ND_FUNC_CALL:
+            printf("    call %s\n", node->func);
+            printf("    push rax\n");
+            return;
         case ND_LVAR:
             // gen_lval()で変数のoffsetをスタックにプッシュして、
             // それをraxレジスタにmov（＝ロード）してからpushする。
