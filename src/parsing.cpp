@@ -231,14 +231,29 @@ Node* primary(){
     if(tok){
         if(tk_consume("(")){
             // func call
-            tk_consume(")");
-
             Node* node = (Node*)calloc(1, sizeof(Node));
             node->kind = ND_FUNC_CALL;
             node->func = (char*)malloc(tok->len + 1);
-
             memcpy(node->func, tok->str, tok->len);
             node->func[tok->len] = '\0';
+
+            // until ")", arguments
+            int arguments = 0;
+
+            Node head = {};
+            Node* cur = &head;
+            while(!tk_consume(")")){
+                if(arguments == 6){
+                    error_at(tok->str, "Arguments is too many.\n");
+                }
+
+                cur = cur->next = expr(); 
+                tk_consume(",");
+                arguments++;
+            }
+            node->arguments = head.next;
+
+            tk_consume(")");
             return node;
         }
 

@@ -77,6 +77,7 @@ typedef struct Node {
 
     char*       func;
     int         len;
+    Node*       arguments;
     
     int         val;
     int         offset;

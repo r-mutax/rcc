@@ -6,6 +6,7 @@ static void gen_compound_stmt(Node* node);
 static void gen_stmt(Node* node);
 
 static int cnt_if = 0;
+static char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
 // function generator
 void funcgen(Function* func){
@@ -123,9 +124,37 @@ void gen(Node* node){
             pa_push(node->val);
             return;
         case ND_FUNC_CALL:
-            printf("    call %s\n", node->func);
-            printf("    push rax\n");
-            return;
+            {
+                int num = 0;
+                for(Node* arg = node->arguments; arg; arg = arg->next){
+                    gen(arg);
+                    num++;
+                }
+
+                for(int i = num - 1; i >= 0; i--)
+                    printf("    pop %s\n" , argreg[i]);
+
+                // alligment stack pointer
+                int seq = cnt_if++;
+                printf("    mov rax, rsp\n");
+                printf("    and rax, 15\n");
+                printf("    jnz .L.call.%d\n", seq);    // if not 16byte aligment.
+
+                // call function
+                printf("    mov rax, 0\n");
+                printf("    call %s\n", node->func);
+                printf("    jmp .L.end.%d\n", seq);
+
+                printf(".L.call.%d:\n", seq);
+                printf("    sub rsp, 8\n");
+                printf("    mov rax, 0\n");
+                printf("    call %s\n", node->func);
+                printf("    add rsp, 8\n");             // undo stack pointer 
+                
+                printf(".L.end.%d:\n", seq);
+                printf("    push rax\n");
+                return;
+            }
         case ND_LVAR:
             // gen_lval()で変数のoffsetをスタックにプッシュして、
             // それをraxレジスタにmov（＝ロード）してからpushする。
