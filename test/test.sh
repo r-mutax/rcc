@@ -30,5 +30,6 @@ assert 8 '{foo123=3; bar=5; return foo123+bar;}'
 assert 8 '{{foo123=3; bar=5; return foo123+bar;}}'
 assert 5 '{{{{{a=5; return a;}}}}}'
 assert 3 '{a = 3; if(3 * 2 != 6) a = 4; return a;}'
+assert 10 '{a = 3; if(3 * 2 != 6) a = 4; else {a = 5;a = a + a;} return a;}'
 
 echo OK

@@ -58,9 +58,15 @@ static void gen_stmt(Node* node){
 
             pa_pop("rax");
             printf("    cmp rax, 0\n");
-            printf("    je .L.if%d\n", cnt_if);
+            printf("    je .L.else%d\n", cnt_if);
             gen_stmt(node->then);
-            printf(".L.if%d:\n", cnt_if);
+            printf("    jmp .L.else%d\n", cnt_if);
+            printf(".L.else%d:\n", cnt_if);
+
+            if(node->els){
+                gen_stmt(node->els);
+            }
+            printf(".L.if_end%d:\n", cnt_if);
 
             cnt_if++;
             break;
