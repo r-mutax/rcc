@@ -32,5 +32,6 @@ assert 5 '{{{{{a=5; return a;}}}}}'
 assert 3 '{a = 3; if(3 * 2 != 6) a = 4; return a;}'
 assert 10 '{a = 3; if(3 * 2 != 6) a = 4; else {a = 5;a = a + a;} return a;}'
 assert 10 '{a = 3; while(a != 10){a = a + 1;} return a;}'
+assert 2 '{a = 0;b = 0;for(a = 1;a < 3; a = a + 1){b = b + 1;} return b;}'
 
 echo OK

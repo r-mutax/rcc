@@ -25,6 +25,7 @@ typedef enum {
     TK_IF,          // if
     TK_ELSE,        // else
     TK_WHILE,       // while
+    TK_FOR,         // for
 } TokenKind;
 
 // トークン構造体
@@ -55,6 +56,7 @@ typedef enum {
     ND_BLOCK,   // ブロック
     ND_IF,      // if
     ND_WHILE,   // while
+    ND_FOR,     // for
 } NodeKind;
 
 typedef struct Node {
@@ -66,6 +68,8 @@ typedef struct Node {
     
     Node*       body;   // body
 
+    Node*       init;       // for-initialize
+    Node*       update;     // for-update
     Node*       cond;
     Node*       then;
     Node*       els;

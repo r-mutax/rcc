@@ -97,7 +97,28 @@ Node* stmt(){
 
         node->then = stmt();
         return node;
-        
+    }else if(tk_consume(TK_FOR)){
+        node = (Node*) calloc(1, sizeof(Node));
+        node->kind = ND_FOR;
+
+        tk_expect("(");
+    
+        if(!tk_consume(";")){
+            node->init = expr();
+            tk_expect(";");
+        } 
+        if(!tk_consume(";")){
+            node->cond = expr();
+            tk_expect(";");
+        }
+
+        if(!tk_consume(")")){
+            node->update = expr();
+            tk_expect(")");
+        }
+
+        node->then = stmt();
+        return node;        
     } else if(tk_consume("{")){
         return compound_stmt();
     } else {
