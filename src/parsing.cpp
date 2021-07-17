@@ -64,7 +64,7 @@ Node* compound_stmt(){
     return node;
 }
 
-// stmt = expr ';' | 'return' expr
+// stmt = expr ';' | 'return' expr | 'if (' expr() ')' | '{' compound_stmt
 Node* stmt(){
     Node* node;
 
@@ -72,6 +72,16 @@ Node* stmt(){
         node = (Node*)calloc(1, sizeof(Node));
         node->kind = ND_RETURN;
         node->lhs = expr();
+    } else if(tk_consume(TK_IF)){
+        node = (Node*)calloc(1, sizeof(Node));
+        node->kind = ND_IF;
+
+        tk_expect("(");
+        node->cond = expr();
+        tk_expect(")");
+
+        node->then = stmt();
+        return node;
     } else if(tk_consume("{")){
         return compound_stmt();
     } else {

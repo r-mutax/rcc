@@ -5,6 +5,8 @@ static void gen_lval(Node* node);
 static void gen_compound_stmt(Node* node);
 static void gen_stmt(Node* node);
 
+static int cnt_if = 0;
+
 // function generator
 void funcgen(Function* func){
 
@@ -50,6 +52,17 @@ static void gen_stmt(Node* node){
         case ND_BLOCK:
             // blockの中にblockが来たとき
             gen_compound_stmt(node);
+            break;
+        case ND_IF:
+            gen(node->cond);
+
+            pa_pop("rax");
+            printf("    cmp rax, 0\n");
+            printf("    je .L.if%d\n", cnt_if);
+            gen_stmt(node->then);
+            printf(".L.if%d:\n", cnt_if);
+
+            cnt_if++;
             break;
         default:
             gen(node);

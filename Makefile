@@ -1,5 +1,5 @@
 # -Wall -Wextra -Winit-self -Wno-missing-field-initializers
-COMPILER	= g++
+COMPILER	= cc
 CFLAGS    = -g -MMD -MP -std=c++17
 ifeq "$(shell getconf LONG_BIT)" "64"
   LDFLAGS = -pthread 
