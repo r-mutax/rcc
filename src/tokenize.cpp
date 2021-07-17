@@ -43,6 +43,12 @@ void tk_tokenize(char *p){
             continue;
         }
 
+        if(strncmp(p, "while", 5) == 0 && !is_alnum(p[5])){
+            cur = new_token(TK_WHILE, cur, p, 5);
+            p += 5;
+            continue;
+        }
+
         if(is_ident1(*p)){
             char *st = p;
             // is_ident2がfalseになるまでポインタを進める。

@@ -87,6 +87,17 @@ Node* stmt(){
             node->els = stmt();
         }
         return node;
+    } else if(tk_consume(TK_WHILE)){
+        node = (Node*) calloc(1, sizeof(Node));
+        node->kind = ND_WHILE;
+        
+        tk_expect("(");
+        node->cond = expr();
+        tk_expect(")");
+
+        node->then = stmt();
+        return node;
+        
     } else if(tk_consume("{")){
         return compound_stmt();
     } else {

@@ -70,6 +70,21 @@ static void gen_stmt(Node* node){
 
             cnt_if++;
             break;
+        case ND_WHILE:
+            printf(".L.while%d:\n", cnt_if);
+            
+            // condition check
+            gen(node->cond);
+            pa_pop("rax");
+            printf("    cmp rax, 0\n");
+            printf("    je .L.end%d\n", cnt_if);
+            
+            gen_stmt(node->then);
+            printf("    jmp .L.while%d\n", cnt_if);
+            printf(".L.end%d:\n", cnt_if);
+
+            cnt_if++;
+            break;
         default:
             gen(node);
             break;
