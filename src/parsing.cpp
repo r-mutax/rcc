@@ -240,7 +240,7 @@ Node* mul(){
     }
 }
 
-// unary = ("+" | "-")? primary
+// unary = (("+" | "-")? primary) | (("&" | "*")? unary)
 Node* unary(){
     if(tk_consume("+")){
         return primary();
@@ -248,6 +248,16 @@ Node* unary(){
 
     if(tk_consume("-")){
         Node* node = new_node(ND_SUB, new_node(0), primary());
+        return node;
+    }
+
+    if(tk_consume("*")){
+        Node* node = new_node(ND_DEREF, unary(), NULL);
+        return node;
+    }
+
+    if(tk_consume("&")){
+        Node* node = new_node(ND_ADDR, unary(), NULL);
         return node;
     }
 

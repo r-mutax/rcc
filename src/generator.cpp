@@ -182,6 +182,16 @@ void gen(Node* node){
             printf("    mov [rax], rdi\n");     // mov <-方向に
             printf("    push rdi\n");
             return;
+        case ND_ADDR:
+            // push stack lval addr
+            gen_lval(node->lhs);
+            return;
+        case ND_DEREF:
+            gen(node->lhs);
+            printf("    pop rax\n");
+            printf("    mov rax, [rax]\n");
+            printf("    push rax\n");
+            return;
     }
 
     // right side ans left side assemble each. 

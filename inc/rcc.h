@@ -58,6 +58,8 @@ typedef enum {
     ND_WHILE,   // while
     ND_FOR,     // for
     ND_FUNC_CALL,   // func calling
+    ND_ADDR,    // *(lval)
+    ND_DEREF,   // &(lval)
 } NodeKind;
 
 typedef struct Node {
