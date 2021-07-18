@@ -86,10 +86,17 @@ typedef struct Node {
 // 識別子リスト
 
 typedef struct Function {
+    Function* next;
+    char*   funcname;
+    
     Node* body;
     int stack_size;
+    int paramater_num;
 } Function;
 
+typedef struct CSrcFile {
+    Function* func;
+} CSrcFile;
 
 typedef enum {
     IDENT_FUNC,

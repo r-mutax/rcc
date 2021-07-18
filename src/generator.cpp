@@ -7,24 +7,32 @@ static void gen_stmt(Node* node);
 
 static int cnt_if = 0;
 static char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+static char *funcname;
 
 // function generator
 void funcgen(Function* func){
 
-    printf(".intel_syntax noprefix\n");
-    printf(".global main\n");
-    printf("main:\n");
+    printf(".global %s\n", func->funcname);
+    printf("%s:\n", func->funcname);
+    funcname = func->funcname;
 
     // prologue
     printf("    push rbp\n");
     printf("    mov rbp, rsp\n");
     printf("    sub rsp, %d\n", func->stack_size);
 
+    // store arguments register to stack.
+    for(int i = 0; i < func->paramater_num; i++){
+        printf("    mov rax, rbp\n");
+        printf("    sub rax, %d\n", (i + 1) * 8);
+        printf("    mov [rax], %s\n", argreg[i]);
+    }
+
     // all the stmt is include by compound stmt.
     gen_compound_stmt(func->body);
 
     // epilogue
-    printf(".L.return:\n");
+    printf(".L.return%s:\n", funcname);
     printf("    mov rsp, rbp\n");
     printf("    pop rbp\n");
     printf("    ret\n");    
@@ -48,7 +56,8 @@ static void gen_stmt(Node* node){
         case ND_RETURN:
             gen(node->lhs);
             printf("    pop rax\n");
-            printf("    jmp .L.return\n");
+            printf("    jmp .L.return%s\n", funcname);
+            cnt_if++;
             return;
         case ND_BLOCK:
             // blockの中にblockが来たとき

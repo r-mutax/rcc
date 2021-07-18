@@ -18,9 +18,15 @@ int main(int argc, char **argv){
     reg_user_input(argv[1]);
     tk_tokenize(argv[1]);
 
-    Function* func = program();
+    CSrcFile* csrcfile = program();
 
-    funcgen(func);
+    printf(".intel_syntax noprefix\n");
+
+    Function* func = csrcfile->func;
+    while(func){
+        funcgen(func);
+        func = func->next;
+    }
 
     return 0;
 }

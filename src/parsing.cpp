@@ -18,26 +18,63 @@ Node* add();
 Node* mul();
 Node* primary();
 Node* unary();
+Function*   func();
 
 
 // program = stmt*
 // ひとまず入力全体で一つのmain関数としてコンパイルする。
-Function* program(){
-    Node head = {};
-    Node* cur = &head;
+CSrcFile* program(){
 
-    // 新しい関数スコープを作る
-    id_begin_scope(SC_FUNC);
+    Function head = {};
+    Function* cur = &head;
 
-    // ここではnodeを数珠つなぎにしていく
+    int n = 0;
     while(!tk_at_eof()){
-        cur->next = stmt();
+        cur->next = func();
         cur = cur->next;
     }
 
+    CSrcFile* csrcfile = (CSrcFile*) calloc(1, sizeof(CSrcFile));
+    csrcfile->func = head.next;
+
+    return csrcfile;
+}
+
+Function*   func(){
+
+    // funcname
+    Token* tok_funcname = tk_expect_ident();
+    tk_expect("(");
+
+    id_begin_scope(SC_FUNC);
+
     Function* func = (Function*) calloc(1, sizeof(Function));
-    // bodyから伸びるnodeのチェーンが関数のstmtの並びになっている。
-    func->body = head.next;
+
+    // paramater definition
+    while(!tk_consume(")")){
+        Token* tok_lvar = tk_consume_ident();
+        if(tok_lvar){
+            Node* lvar_node = (Node*)calloc(1, sizeof(Node));
+
+            Ident* ident = id_find_ident(tok_lvar);
+            if(ident){
+                // error, redifinition paramater.
+                error_at(tok_lvar->str, "再定義されました。");
+            } else {
+                // add paramater as local variable.
+                ident = id_declare_lvar(tok_lvar);
+                func->paramater_num++;
+            }
+            tk_consume(",");
+        }
+    }
+
+    // func body
+    tk_expect("{");    
+    func->body = compound_stmt();
+    func->funcname = (char*)malloc(tok_funcname->len + 1);
+    memcpy(func->funcname, tok_funcname->str, tok_funcname->len);
+    func->funcname[tok_funcname->len] = '\0';
 
     // stack_sizeの計算
     func->stack_size = id_get_curfunc_stack_size();
@@ -70,7 +107,6 @@ Node* compound_stmt(){
 //       | '{' compound_stmt
 Node* stmt(){
     Node* node;
-
     if(tk_consume(TK_RETURN)){
         node = (Node*)calloc(1, sizeof(Node));
         node->kind = ND_RETURN;

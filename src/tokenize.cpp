@@ -140,6 +140,17 @@ Token* tk_consume_ident(){
     return tok;
 }
 
+Token* tk_expect_ident(){
+    if(token->kind != TK_IDENT){
+        error_at(token->str, "関数ではありません。");
+        return NULL;
+    }
+
+    Token* tok = token;
+    token = token->next;
+    return tok;
+}
+
 void tk_expect(const char* op){
     if(token->kind != TK_RESERVED
         || token->len != strlen(op)
@@ -175,4 +186,9 @@ static bool is_ident2(char c) {
 
 static bool is_alnum(char c) {
     return is_ident2(c);
+}
+
+void tk_print(){
+    char c = *(token->str);
+    printf("%c",c);
 }

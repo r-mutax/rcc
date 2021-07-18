@@ -4,7 +4,7 @@
 #include <rcc.h>
 
 
-Function* program();
+CSrcFile* program();
 Node** pr_getNode();
 
 
