@@ -6,7 +6,7 @@ static void gen_compound_stmt(Node* node);
 static void gen_stmt(Node* node);
 
 static int cnt_if = 0;
-static char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+static const char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 static char *funcname;
 
 // function generator

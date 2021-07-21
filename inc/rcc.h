@@ -26,6 +26,7 @@ typedef enum {
     TK_ELSE,        // else
     TK_WHILE,       // while
     TK_FOR,         // for
+    TK_TYPE,        // type
 } TokenKind;
 
 // トークン構造体

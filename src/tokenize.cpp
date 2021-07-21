@@ -55,6 +55,12 @@ void tk_tokenize(char *p){
             continue;
         }
 
+        if(strncmp(p, "int", 3) == 0 && !is_alnum(p[3])){
+            cur = new_token(TK_TYPE, cur, p, 3);
+            p += 3;
+            continue;
+        }
+
         if(is_ident1(*p)){
             char *st = p;
             // is_ident2がfalseになるまでポインタを進める。
@@ -158,6 +164,23 @@ void tk_expect(const char* op){
         error_at(token->str, "'%s'ではありません。", op);
 
     token = token->next;
+}
+
+void tk_expect_type(void){
+    if(token->kind != TK_TYPE){
+        error_at(token->str, "It is not type.");
+    }
+
+    token = token->next;
+}
+
+Token* tk_consume_type(){
+    if(token->kind == TK_TYPE){
+        Token* buf = token;
+        token = token->next;
+        return buf;
+    }
+    return NULL;
 }
 
 int tk_expect_number(){

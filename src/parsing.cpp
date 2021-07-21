@@ -42,6 +42,9 @@ CSrcFile* program(){
 
 Function*   func(){
 
+    // type
+    tk_expect_type();
+
     // funcname
     Token* tok_funcname = tk_expect_ident();
     tk_expect("(");
@@ -52,9 +55,12 @@ Function*   func(){
 
     // paramater definition
     while(!tk_consume(")")){
+        // first, type definition.
+        tk_expect_type();
+
         Token* tok_lvar = tk_consume_ident();
         if(tok_lvar){
-            Node* lvar_node = (Node*)calloc(1, sizeof(Node));
+            // Node* lvar_node = (Node*)calloc(1, sizeof(Node));
 
             Ident* ident = id_find_ident(tok_lvar);
             if(ident){
@@ -88,6 +94,8 @@ Function*   func(){
 // compound_stmt = stmt* "}"
 Node* compound_stmt(){
 
+    id_begin_scope(SC_BLOCK);
+
     Node head = {};
     Node* cur = &head;
 
@@ -98,6 +106,9 @@ Node* compound_stmt(){
     Node* node = (Node*)calloc(1, sizeof(Node));
     node->kind = ND_BLOCK;
     node->body = head.next;
+
+    id_end_scope();
+
     return node;
 }
 
@@ -177,6 +188,24 @@ Node* assign(){
 
 // expr = equality()
 Node* expr(){
+    if(Token* tok = tk_consume_type()){
+
+        tok = tk_expect_ident();
+
+        Node* node = (Node*)calloc(1, sizeof(Node));
+        node->kind = ND_LVAR;
+        
+        Ident* ident = id_find_ident(tok);
+        if(ident){
+            error_at(tok->str, "'%s' is redifiniton.", ident->name);
+        } else {
+            ident = id_declare_lvar(tok);
+        }
+
+        node->offset = ident->offset;
+
+        return node;
+    }
     return assign();
 }
 
@@ -312,8 +341,9 @@ Node* primary(){
         if(ident){
             node->offset = ident->offset;
         } else {
-            ident = id_declare_lvar(tok);
-            node->offset = ident->offset;
+            char* ident_name = (char*) calloc(1, tok->len);
+            memcpy(ident_name, tok->str, tok->len);
+            error_at(tok->str, "'%s' is no declared in this scope.", ident_name);
         }
         return node;
     }

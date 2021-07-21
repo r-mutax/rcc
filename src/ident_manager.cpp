@@ -74,12 +74,12 @@ Ident* id_find_ident(Token* tok){
     // 見つかったらそれを識別子にする。
 
     for(IdentScope* iscope = sc_cur; iscope; iscope = iscope->parent){
-        for(Ident* ident = sc_cur->idents; ident; ident = ident->next){
+        for(Ident* ident = iscope->idents; ident; ident = ident->next){
             if(ident->len = tok->len && !memcmp(tok->str, ident->name, tok->len)){
                 return ident;
             }
         }
-    }
+    }  
     return NULL;
 }
 

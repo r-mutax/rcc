@@ -13,6 +13,8 @@ void tk_tokenize(char *p);
 Token* tk_consume_ident();
 bool tk_consume_return();
 Token* tk_expect_ident();
+void tk_expect_type();
+Token* tk_consume_type();
 void tk_print();
 
 #endif
