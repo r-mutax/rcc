@@ -43,7 +43,7 @@ CSrcFile* program(){
 Function*   func(){
 
     // type
-    tk_expect_type();
+    tk_expect_ident("int");
 
     // funcname
     Token* tok_funcname = tk_expect_ident();
@@ -56,7 +56,7 @@ Function*   func(){
     // paramater definition
     while(!tk_consume(")")){
         // first, type definition.
-        tk_expect_type();
+        tk_expect_ident("int");
 
         Token* tok_lvar = tk_consume_ident();
         if(tok_lvar){
@@ -118,11 +118,11 @@ Node* compound_stmt(){
 //       | '{' compound_stmt
 Node* stmt(){
     Node* node;
-    if(tk_consume(TK_RETURN)){
+    if(tk_consume("return")){
         node = (Node*)calloc(1, sizeof(Node));
         node->kind = ND_RETURN;
         node->lhs = expr();
-    } else if(tk_consume(TK_IF)){
+    } else if(tk_consume("if")){
         node = (Node*)calloc(1, sizeof(Node));
         node->kind = ND_IF;
         tk_expect("(");
@@ -130,11 +130,11 @@ Node* stmt(){
         tk_expect(")");
         node->then = stmt();
 
-        if(tk_consume(TK_ELSE)){
+        if(tk_consume("else")){
             node->els = stmt();
         }
         return node;
-    } else if(tk_consume(TK_WHILE)){
+    } else if(tk_consume("while")){
         node = (Node*) calloc(1, sizeof(Node));
         node->kind = ND_WHILE;
         
@@ -144,7 +144,7 @@ Node* stmt(){
 
         node->then = stmt();
         return node;
-    }else if(tk_consume(TK_FOR)){
+    }else if(tk_consume("for")){
         node = (Node*) calloc(1, sizeof(Node));
         node->kind = ND_FOR;
 
@@ -188,7 +188,7 @@ Node* assign(){
 
 // expr = equality()
 Node* expr(){
-    if(Token* tok = tk_consume_type()){
+    if(Token* tok = tk_consume_ident("int")){
 
         tok = tk_expect_ident();
 

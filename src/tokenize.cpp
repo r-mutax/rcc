@@ -25,42 +25,6 @@ void tk_tokenize(char *p){
             continue;
         }
 
-        if(strncmp(p, "return", 6) == 0 && !is_alnum(p[6])){
-            cur = new_token(TK_RETURN, cur, p, 6);
-            p += 6;
-            continue;
-        }
-
-        if(strncmp(p, "if", 2) == 0 && !is_alnum(p[2])){
-            cur = new_token(TK_IF, cur, p, 2);
-            p += 2;
-            continue;
-        }
-
-        if(strncmp(p, "else", 4) == 0 && !is_alnum(p[4])){
-            cur = new_token(TK_ELSE, cur, p, 4);
-            p += 4;
-            continue;
-        }
-
-        if(strncmp(p, "while", 5) == 0 && !is_alnum(p[5])){
-            cur = new_token(TK_WHILE, cur, p, 5);
-            p += 5;
-            continue;
-        }
-
-        if(strncmp(p, "for", 3) == 0 && !is_alnum(p[3])){
-            cur = new_token(TK_FOR, cur, p, 3);
-            p += 3;
-            continue;
-        }
-
-        if(strncmp(p, "int", 3) == 0 && !is_alnum(p[3])){
-            cur = new_token(TK_TYPE, cur, p, 3);
-            p += 3;
-            continue;
-        }
-
         if(is_ident1(*p)){
             char *st = p;
             // is_ident2がfalseになるまでポインタを進める。
@@ -118,8 +82,7 @@ Token* new_token(TokenKind kind, Token *cur, char *str, int len){
 }
 
 bool tk_consume(const char* op){
-    if(token->kind != TK_RESERVED 
-        || strlen(op) != token->len
+    if(strlen(op) != token->len
         || memcmp(token->str, op, token->len))
         return false;
     
@@ -146,6 +109,18 @@ Token* tk_consume_ident(){
     return tok;
 }
 
+Token* tk_consume_ident(const char* op){
+    if(token->kind != TK_IDENT
+        || strlen(op) != token->len
+        || memcmp(token->str, op, token->len)){
+        return NULL;
+    }
+
+    Token* tok = token;
+    token = token->next;
+    return tok;
+}
+
 Token* tk_expect_ident(){
     if(token->kind != TK_IDENT){
         error_at(token->str, "関数ではありません。");
@@ -157,30 +132,25 @@ Token* tk_expect_ident(){
     return tok;
 }
 
+Token* tk_expect_ident(const char* op){
+    if(token->kind != TK_IDENT
+        || strlen(op) != token->len
+        || memcmp(token->str, op, token->len)){
+        error_at(token->str, "関数ではありません。");
+        return NULL;
+    }
+
+    Token* tok = token;
+    token = token->next;
+    return tok;
+}
+
 void tk_expect(const char* op){
-    if(token->kind != TK_RESERVED
-        || token->len != strlen(op)
+    if(token->len != strlen(op)
         || memcmp(token->str, op, token->len))
         error_at(token->str, "'%s'ではありません。", op);
 
     token = token->next;
-}
-
-void tk_expect_type(void){
-    if(token->kind != TK_TYPE){
-        error_at(token->str, "It is not type.");
-    }
-
-    token = token->next;
-}
-
-Token* tk_consume_type(){
-    if(token->kind == TK_TYPE){
-        Token* buf = token;
-        token = token->next;
-        return buf;
-    }
-    return NULL;
 }
 
 int tk_expect_number(){

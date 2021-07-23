@@ -4,17 +4,20 @@
 #include <rcc.h>
 
 // 汎用関数
+void tk_tokenize(char *p);
+
+
 bool tk_consume(const char* op);
 bool tk_consume(TokenKind kind);
 void tk_expect(const char* op);
+
+Token* tk_consume_ident();
+Token* tk_consume_ident(const char* op);
+Token* tk_expect_ident();
+Token* tk_expect_ident(const char* op);
+
 int tk_expect_number();
 bool tk_at_eof();
-void tk_tokenize(char *p);
-Token* tk_consume_ident();
-bool tk_consume_return();
-Token* tk_expect_ident();
-void tk_expect_type();
-Token* tk_consume_type();
 void tk_print();
 
 #endif
