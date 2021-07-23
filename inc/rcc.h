@@ -95,17 +95,39 @@ typedef struct CSrcFile {
     Function* func;
 } CSrcFile;
 
+// ===============================
+//  type manager
+// ===============================
+
+typedef enum {
+    TYPE_INT,
+    TYPE_POINTER
+} TypeKind;
+
+typedef struct Type{
+    const char* type_name;
+    TypeKind    kind;
+    Type*       pointer_to;
+    Type*       pointer_from;
+    Type*       next;
+} Type;
+
+// ===============================
+//  ident manager
+// ===============================
+
 typedef enum {
     IDENT_FUNC,
     IDENT_LVAL,
-} IdentType;
+} IdentKind;
 
 typedef struct Ident {
-    IdentType   type;
+    IdentKind   kind;
     Ident*      next;
     char*       name;
     int         len;
     int         offset;
+    Type*       type;
 } Ident;
 
 typedef enum {

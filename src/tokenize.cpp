@@ -1,5 +1,6 @@
 
-#include <tokenize.h>
+#include "tokenize.h"
+#include "typemgr.h"
 
 struct Token *token;
 
@@ -155,11 +156,35 @@ void tk_expect(const char* op){
 
 int tk_expect_number(){
     if(token->kind != TK_NUM)
-        error_at(token->str, "数値ではありません");
+        error_at(token->str, "This is not numeric.");
 
     int val = token->val;
     token = token->next;
     return val;
+}
+
+Token* tk_expect_type(){
+
+    if(token->kind != TK_IDENT
+        || ty_get_type(token->str, token->len) == NULL)
+        error_at(token->str, "This is not type.");
+    
+    Token* tok = token;
+    token = token->next;
+    return tok;
+}
+
+Token* tk_consume_type() {
+
+    // if next token is not type.
+    // retuen NULL pointer.
+    if(token->kind != TK_IDENT
+        || ty_get_type(token->str, token->len) == NULL)
+        return NULL;
+    
+    Token* tok = token;
+    token = token->next;
+    return tok;
 }
 
 bool tk_at_eof(){

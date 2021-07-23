@@ -28,12 +28,13 @@ void id_end_scope(){
 }
 
 // 変数宣言を、現在のスコープの変数リストに追加する。
-Ident* id_declare_lvar(Token* tok){
+Ident* id_declare_lvar(Token* tok, Type* type){
     Ident* ident = (Ident*) calloc(1,sizeof(Ident));
 
-    ident->type = IDENT_LVAL;
+    ident->kind = IDENT_LVAL;
     ident->name = tok->str;
     ident->len = tok->len;
+    ident->type = type;
 
     // 関数で使用するスタックサイズを増やす
     IdentScope* funcscope = lid_get_func_scope();

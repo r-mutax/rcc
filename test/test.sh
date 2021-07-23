@@ -16,6 +16,8 @@ assert(){
         exit 1
     fi
 }
+
+assert 5 'int main(){int a;int *b; b = &a; *b = 5; return a;}'
 assert 3 'int main(){int a; a=3; return a;}'
 assert 1 'int main(){0; return 1; return 3; return 4;}'
 assert 9 'int main(){return (3+5*( 9 - 6 ))   /2;}'

@@ -2,6 +2,7 @@
 #include "parsing.h"
 #include "tokenize.h"
 #include "ident_manager.h"
+#include "typemgr.h"
 
 // local
 Node* new_node(NodeKind kind, Node* lhs, Node* rhs);
@@ -10,6 +11,7 @@ Node* new_node(int val);
 // grammer
 Node* compound_stmt();
 Node* stmt();
+Node* declare(Token* tok_type);
 Node* expr();
 Node* assign();
 Node* equality();
@@ -24,6 +26,8 @@ Function*   func();
 // program = stmt*
 // ひとまず入力全体で一つのmain関数としてコンパイルする。
 CSrcFile* program(){
+
+    ty_init();
 
     Function head = {};
     Function* cur = &head;
@@ -43,7 +47,7 @@ CSrcFile* program(){
 Function*   func(){
 
     // type
-    tk_expect_ident("int");
+    Token* tok_retval_type = tk_expect_type();
 
     // funcname
     Token* tok_funcname = tk_expect_ident();
@@ -56,23 +60,13 @@ Function*   func(){
     // paramater definition
     while(!tk_consume(")")){
         // first, type definition.
-        tk_expect_ident("int");
-
-        Token* tok_lvar = tk_consume_ident();
-        if(tok_lvar){
-            // Node* lvar_node = (Node*)calloc(1, sizeof(Node));
-
-            Ident* ident = id_find_ident(tok_lvar);
-            if(ident){
-                // error, redifinition paramater.
-                error_at(tok_lvar->str, "再定義されました。");
-            } else {
-                // add paramater as local variable.
-                ident = id_declare_lvar(tok_lvar);
-                func->paramater_num++;
-            }
-            tk_consume(",");
+        Token* tok_type = tk_expect_type();
+        Node* node = declare(tok_type);
+        if(node){
+            func->paramater_num++;
         }
+
+        tk_consume(",");
     }
 
     // func body
@@ -186,25 +180,36 @@ Node* assign(){
     return node;
 }
 
+// declare = "int" "*"* identify
+Node* declare(Token* tok_type){
+
+    // judge type(pointer?)
+    Type* type = ty_get_type(tok_type->str, tok_type->len);
+    while(tk_consume("*")){
+        type = ty_pointer_to(type);
+    }
+
+    // ecpect lvar identifer
+    Token* tok = tk_expect_ident();
+    Node* node = (Node*)calloc(1, sizeof(Node));
+    node->kind = ND_LVAR;
+    
+    Ident* ident = id_find_ident(tok);
+    if(ident){
+        error_at(tok->str, "'%s' is redifiniton.", ident->name);
+    } else {
+        ident = id_declare_lvar(tok, type);
+    }
+
+    node->offset = ident->offset;
+
+    return node;
+}
+
 // expr = equality()
 Node* expr(){
-    if(Token* tok = tk_consume_ident("int")){
-
-        tok = tk_expect_ident();
-
-        Node* node = (Node*)calloc(1, sizeof(Node));
-        node->kind = ND_LVAR;
-        
-        Ident* ident = id_find_ident(tok);
-        if(ident){
-            error_at(tok->str, "'%s' is redifiniton.", ident->name);
-        } else {
-            ident = id_declare_lvar(tok);
-        }
-
-        node->offset = ident->offset;
-
-        return node;
+    if(Token* tok = tk_consume_type()){
+        return declare(tok);
     }
     return assign();
 }

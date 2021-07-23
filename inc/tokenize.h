@@ -16,6 +16,9 @@ Token* tk_consume_ident(const char* op);
 Token* tk_expect_ident();
 Token* tk_expect_ident(const char* op);
 
+Token* tk_expect_type();
+Token* tk_consume_type();
+
 int tk_expect_number();
 bool tk_at_eof();
 void tk_print();
