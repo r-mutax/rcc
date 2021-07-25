@@ -17,6 +17,9 @@ assert(){
     fi
 }
 
+assert 3 'int main() {int* p; tmalloc(&p); int* q; q = p + 3; return q - p;}'
+assert 2 'int main() {int* p; tmalloc(&p); int* q; q = p + 1;return *q;}'
+assert 18 'int main(){return foo() + 4;}'
 assert 5 'int main(){int a;int *b; b = &a; *b = 5; return a;}'
 assert 3 'int main(){int a; a=3; return a;}'
 assert 1 'int main(){0; return 1; return 3; return 4;}'
@@ -31,7 +34,6 @@ assert 5 'int main(){{{{{int a; a=5; return a;}}}}}'
 assert 10 'int main(){int a; a = 3; if(3 * 2 != 6) a = 4; else {a = 5;a = a + a;} return a;}'
 assert 10 'int main(){int a;a = 3; while(a != 10){a = a + 1;} return a;}'
 assert 2 'int main(){int a; int b;a = 0;b = 0;for(a = 1;a < 3; a = a + 1){b = b + 1;} return b;}'
-assert 18 'int main(){return foo() + 4;}'
 assert 7 'int main(){return add(3,4);}'
 assert 25 'int add2(int a,int b){return a + b;} int main(){return add2(10,15);}'
 assert 3 'int main(){int a; int b;a = 3; b = &a; return *b;}'

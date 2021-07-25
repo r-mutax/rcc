@@ -52,7 +52,7 @@ void ty_add_type(Node* node){
     //     variable address(& operator) -> pointer of lhs node
     //     dref                         -> lhs->type is pointer ? pointer from lhs : integer
 
-    if(!node){
+    if(!node || node->type){
         return;
     }
 
@@ -80,14 +80,16 @@ void ty_add_type(Node* node){
         case ND_LT:
         case ND_LE:
         case ND_NUM:
+        case ND_FUNC_CALL:
             node->type = ty_get_type("int", 3);
             break;
         case ND_ADDR:
             node->type = ty_pointer_to(node->lhs->type);
             break;
         case ND_DEREF:
-            if (node->lhs->type->kind == TYPE_POINTER)
+            if (node->lhs->type->kind == TYPE_POINTER){
                 node->type = node->lhs->type->pointer_from;
+            }
             else
                 node->type = ty_get_type("int", 3);;
             break;

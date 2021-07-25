@@ -5,8 +5,10 @@
 #include "typemgr.h"
 
 // local
-Node* new_node(NodeKind kind, Node* lhs, Node* rhs);
-Node* new_node(int val);
+static Node* new_node(NodeKind kind, Node* lhs, Node* rhs);
+static Node* new_node(int val);
+static Node* new_add(Node* lhs, Node* rhs);
+static Node* new_sub(Node* lhs, Node* rhs);
 
 // grammer
 Node* compound_stmt();
@@ -258,9 +260,9 @@ Node* add(){
 
     for(;;){
         if(tk_consume("+"))
-            node = new_node(ND_ADD, node, mul());
+            node = new_add(node, mul());
         else if (tk_consume("-"))
-            node = new_node(ND_SUB, node, mul());
+            node = new_sub(node, mul());
         else
             return node;
     }
@@ -363,7 +365,7 @@ Node* primary(){
     return new_node(tk_expect_number());
 }
 
-Node* new_node(NodeKind kind, Node* lhs, Node* rhs){
+static Node* new_node(NodeKind kind, Node* lhs, Node* rhs){
     Node* node = (Node*)calloc(1, sizeof(Node));
     node->kind = kind;
     node->lhs = lhs;
@@ -371,9 +373,108 @@ Node* new_node(NodeKind kind, Node* lhs, Node* rhs){
     return node;
 }
 
-Node* new_node(int val){
+static Node* new_node(int val){
     Node* node = (Node*)calloc(1, sizeof(Node));
     node->kind = ND_NUM;
     node->val = val;
+    return node;
+}
+
+static Node* new_add(Node* lhs, Node* rhs){
+
+    ty_add_type(lhs);
+    ty_add_type(rhs);
+
+    Node* node = (Node*)calloc(1, sizeof(Node));
+    node->kind = ND_ADD;
+
+    // num + num
+    if(!lhs->type->pointer_to
+        && !rhs->type->pointer_to){
+        node->lhs = lhs;
+        node->rhs = rhs;
+        return node;
+    }
+
+    // pointer + pointer
+    if(lhs->type->pointer_to
+        && rhs->type->pointer_to){
+        error("[Internal Error] : Try add pointer and pointer.");
+        return node;
+    }
+
+    // num + pointer -> change rhs and lhs
+    if(!lhs->type->pointer_to
+        && rhs->type->pointer_to){
+        Node*   buf = rhs;
+        rhs = lhs;
+        lhs = buf;
+    }
+
+    // pointer + num
+    Node* rhs_buf = rhs;
+
+    rhs = (Node*)calloc(1, sizeof(Node));
+    rhs->kind = ND_MUL;
+    rhs->lhs = rhs_buf;
+    rhs->rhs = new_node(8);
+
+    node->kind = ND_ADD;
+    node->lhs = lhs;
+    node->rhs = rhs;
+
+    return node;
+}
+
+static Node* new_sub(Node* lhs, Node* rhs){
+
+    ty_add_type(lhs);
+    ty_add_type(rhs);
+
+    Node* node = (Node*)calloc(1, sizeof(Node));
+    node->kind = ND_SUB;
+
+    // num - num
+    if(!lhs->type->pointer_to
+        && !rhs->type->pointer_to){
+        node->lhs = lhs;
+        node->rhs = rhs;
+        return node;
+    }
+
+    // pointer - num
+    if(lhs->type->pointer_to
+        && !rhs->type->pointer_to)
+    {
+        // pointer + num
+        Node* rhs_buf = rhs;
+
+        rhs = (Node*)calloc(1, sizeof(Node));
+        rhs->kind = ND_MUL;
+        rhs->lhs = rhs_buf;
+        rhs->rhs = new_node(8);
+
+        node->kind = ND_ADD;
+        node->lhs = lhs;
+        node->rhs = rhs;
+        return node;
+    }
+
+    // pointer - pointer
+    if(lhs->type->pointer_to
+        && rhs->type->pointer_to){
+
+        // how many element between two
+        node->kind = ND_DIV;
+
+        node->lhs = new_node(ND_SUB, lhs, rhs);
+        node->rhs = new_node(8);
+        return node;
+    }
+
+    // num - pointer
+    //  -> Invalid operand.
+    error("[Internal Error] : Try sub pointer from num.");
+
     return node;
 }
