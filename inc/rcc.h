@@ -109,6 +109,7 @@ typedef struct Type{
     TypeKind    kind;
     Type*       pointer_to;
     Type*       pointer_from;
+    int         size;
     Type*       next;
 } Type;
 

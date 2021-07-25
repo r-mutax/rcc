@@ -11,6 +11,7 @@ void ty_init(){
 
     int_type->kind = TYPE_INT;
     int_type->type_name = TYPE_NAME_INT;
+    int_type->size = 8;
 
     type_dict.next = int_type;
 }
@@ -25,6 +26,7 @@ Type* ty_pointer_to(Type* base_type)
 
     type->kind = TYPE_POINTER;
     type->pointer_to = base_type;
+    type->size = 8;
     base_type->pointer_from = type;
 
     return type;
@@ -34,7 +36,7 @@ Type* ty_get_type(char* c, int len)
 {
     for(Type* ty = type_dict.next; ty; ty = ty->next)
     {
-        if(memcmp(c, ty->type_name, len) == NULL){
+        if(memcmp(c, ty->type_name, len) == 0){
             // find base type
             return ty;
         }

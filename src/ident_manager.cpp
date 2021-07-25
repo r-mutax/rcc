@@ -38,7 +38,7 @@ Ident* id_declare_lvar(Token* tok, Type* type){
 
     // 関数で使用するスタックサイズを増やす
     IdentScope* funcscope = lid_get_func_scope();
-    funcscope->stacksize += 8;
+    funcscope->stacksize += type->size;
 
     // オフセットは、関数で使用するスタックサイズの一番最後になる。
     ident->offset = funcscope->stacksize;
