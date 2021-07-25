@@ -33,6 +33,24 @@ typedef struct Token {
 } Token;
 
 // ===============================
+//  type manager
+// ===============================
+
+typedef enum {
+    TYPE_INT,
+    TYPE_POINTER
+} TypeKind;
+
+typedef struct Type{
+    const char* type_name;
+    TypeKind    kind;
+    Type*       pointer_to;
+    Type*       pointer_from;
+    int         size;
+    Type*       next;
+} Type;
+
+// ===============================
 //  parser
 // ===============================
 typedef enum {
@@ -59,12 +77,12 @@ typedef enum {
 
 typedef struct Node {
     NodeKind    kind;
-    Node*       next;   // 次のstmtの内容
+    Node*       next;       // 次のstmtの内容
 
     Node*       lhs;
     Node*       rhs;
     
-    Node*       body;   // body
+    Node*       body;       // body
 
     Node*       init;       // for-initialize
     Node*       update;     // for-update
@@ -78,6 +96,8 @@ typedef struct Node {
     
     int         val;
     int         offset;
+
+    Type*       type;
 } Node;
 
 // 識別子リスト
@@ -95,23 +115,6 @@ typedef struct CSrcFile {
     Function* func;
 } CSrcFile;
 
-// ===============================
-//  type manager
-// ===============================
-
-typedef enum {
-    TYPE_INT,
-    TYPE_POINTER
-} TypeKind;
-
-typedef struct Type{
-    const char* type_name;
-    TypeKind    kind;
-    Type*       pointer_to;
-    Type*       pointer_from;
-    int         size;
-    Type*       next;
-} Type;
 
 // ===============================
 //  ident manager

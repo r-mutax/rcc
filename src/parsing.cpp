@@ -95,6 +95,7 @@ Node* compound_stmt(){
 
     while(!tk_consume("}")){
         cur = cur->next = stmt();
+        ty_add_type(cur);
     }
 
     Node* node = (Node*)calloc(1, sizeof(Node));
@@ -250,6 +251,11 @@ Node* relational(){
 Node* add(){
     Node* node = mul();
 
+    // num add num          -> ok
+    // pointer add pointer  -> ng
+    // pointer add num      -> ok
+    // add <-> sub
+
     for(;;){
         if(tk_consume("+"))
             node = new_node(ND_ADD, node, mul());
@@ -345,6 +351,7 @@ Node* primary(){
 
         if(ident){
             node->offset = ident->offset;
+            node->type = ident->type;
         } else {
             char* ident_name = (char*) calloc(1, tok->len);
             memcpy(ident_name, tok->str, tok->len);
