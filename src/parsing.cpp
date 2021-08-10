@@ -284,6 +284,12 @@ Node* mul(){
 
 // unary = (("+" | "-")? primary) | (("&" | "*")? unary)
 Node* unary(){
+
+    if(tk_consume("sizeof")){
+        Node* node = unary();
+        ty_add_type(node);
+        return new_node(node->type->size);
+    }
     if(tk_consume("+")){
         return primary();
     }
