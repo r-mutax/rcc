@@ -1,6 +1,15 @@
 #include <generator.h>
 #include <pr_assm.h>
 
+/*
+    gen_**() function is stored result at rax register.
+
+    ex.)
+        gen_lval() : ND_LVAR -> stored variable address to rax reg.
+        gen() : ND_ADD,ND_SUB... -> stored caliculate result to rax reg.
+        gen() : ND_NUM -> stored number to rax reg.
+*/
+
 static void gen_lval(Node* node);
 static void gen_compound_stmt(Node* node);
 static void gen_stmt(Node* node);
@@ -55,7 +64,6 @@ static void gen_stmt(Node* node){
     switch(node->kind){
         case ND_RETURN:
             gen(node->lhs);
-            printf("    pop rax\n");
             printf("    jmp .L.return%s\n", funcname);
             cnt_if++;
             return;
@@ -66,7 +74,6 @@ static void gen_stmt(Node* node){
         case ND_IF:
             gen(node->cond);
 
-            pa_pop("rax");
             printf("    cmp rax, 0\n");
             printf("    je .L.else%d\n", cnt_if);
             gen_stmt(node->then);
@@ -85,7 +92,6 @@ static void gen_stmt(Node* node){
             
             // condition check
             gen(node->cond);
-            pa_pop("rax");
             printf("    cmp rax, 0\n");
             printf("    je .L.end%d\n", cnt_if);
             
@@ -102,7 +108,6 @@ static void gen_stmt(Node* node){
 
             // condition check
             gen(node->cond);
-            pa_pop("rax");
             printf("    cmp rax, 0\n");
             printf("    je .L.end%d\n", cnt_if);
             
@@ -130,18 +135,17 @@ void gen(Node* node){
     // if primary immidiate return.
     switch(node->kind){
         case ND_NUM:
-            pa_push(node->val);
+            //pa_push(node->val);
+            printf("    mov rax, %d\n",node->val);
             return;
         case ND_FUNC_CALL:
             {
                 int num = 0;
                 for(Node* arg = node->arguments; arg; arg = arg->next){
                     gen(arg);
+                    printf("    mov %s, rax\n", argreg[num]);
                     num++;
                 }
-
-                for(int i = num - 1; i >= 0; i--)
-                    printf("    pop %s\n" , argreg[i]);
 
                 // alligment stack pointer
                 int seq = cnt_if++;
@@ -161,25 +165,25 @@ void gen(Node* node){
                 printf("    add rsp, 8\n");             // undo stack pointer 
                 
                 printf(".L.end.%d:\n", seq);
-                printf("    push rax\n");
                 return;
             }
         case ND_LVAR:
             // gen_lval()で変数のoffsetをスタックにプッシュして、
             // それをraxレジスタにmov（＝ロード）してからpushする。
             gen_lval(node);
-            pa_pop("rax");
             printf("    mov rax, [rax]\n");
-            printf("    push rax\n");
             return;
         case ND_ASSIGN:
             // 左辺値 = 識別子のアドレス、右辺値の結果の順にスタックへ積む
             gen_lval(node->lhs);
+            printf("    push rax\n");
             gen(node->rhs);
-            printf("    pop rdi\n");            // 左辺値のアドレス
-            printf("    pop rax\n");            // 右辺値の結果
+            printf("    push rax\n");
+
+            printf("    pop rdi\n");
+            printf("    pop rax\n");
             printf("    mov [rax], rdi\n");     // mov <-方向に
-            printf("    push rdi\n");
+            printf("    mov rax, rdi\n");
             return;
         case ND_ADDR:
             // push stack lval addr
@@ -187,19 +191,17 @@ void gen(Node* node){
             return;
         case ND_DEREF:
             gen(node->lhs);
-            printf("    pop rax\n");
             printf("    mov rax, [rax]\n");
-            printf("    push rax\n");
             return;
     }
 
     // right side ans left side assemble each. 
     gen(node->lhs);
-    gen(node->rhs);
+    printf("    push rax\n");
 
-    // pop lhs and rhs
-    pa_pop("rdi");
-    pa_pop("rax");
+    gen(node->rhs);
+    printf("    mov rdi, rax\n");
+    printf("    pop rax\n");
 
     // calculate and store result to stack top.
     switch(node->kind){
@@ -237,8 +239,6 @@ void gen(Node* node){
             printf("    movzb rax, al\n");
             break;
     }
-
-    printf("    push rax\n");
 }
 
 // generate value address in stack
@@ -251,13 +251,10 @@ void gen_lval(Node* node){
         case ND_LVAR:
             printf("    mov rax, rbp\n");
             printf("    sub rax, %d\n", node->offset);
-            printf("    push rax\n");
             break;
         case ND_DEREF:
             gen_lval(node->lhs);
-            printf("    pop rax\n");
             printf("    mov rax, [rax]\n");
-            printf("    push rax\n");
             break;
         default:
             error("This is not address or variable at assignment.");
