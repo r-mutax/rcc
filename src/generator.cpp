@@ -168,30 +168,38 @@ void gen(Node* node){
                 return;
             }
         case ND_LVAR:
-            // gen_lval()で変数のoffsetをスタックにプッシュして、
-            // それをraxレジスタにmov（＝ロード）してからpushする。
+            // gen_lval() -> stored variable address to rax register.
+            // then, load [rax] to rax register.
             gen_lval(node);
             printf("    mov rax, [rax]\n");
             return;
         case ND_ASSIGN:
-            // 左辺値 = 識別子のアドレス、右辺値の結果の順にスタックへ積む
+            // gen_lval() -> stored variable address to rax register.
+            // then, stored to stack variable address.
             gen_lval(node->lhs);
             printf("    push rax\n");
+
+            // gen() -> compile rhs and stored result to rax register.
+            // then, rax push to stack.
             gen(node->rhs);
             printf("    push rax\n");
 
+            // load rhs result to [rax] register.
+            // and keep on rax register.
             printf("    pop rdi\n");
             printf("    pop rax\n");
             printf("    mov [rax], rdi\n");     // mov <-方向に
             printf("    mov rax, rdi\n");
             return;
         case ND_ADDR:
-            // push stack lval addr
+            // get variable address, and keep on rax register.
             gen_lval(node->lhs);
             return;
         case ND_DEREF:
             gen(node->lhs);
             printf("    mov rax, [rax]\n");
+            return;
+        case ND_DECLARE:
             return;
     }
 
@@ -243,9 +251,6 @@ void gen(Node* node){
 
 // generate value address in stack
 void gen_lval(Node* node){
-    // if(node->kind != ND_LVAR){
-    //     error("代入の左辺値が変数ではありません！");
-    // }
 
     switch(node->kind){
         case ND_LVAR:

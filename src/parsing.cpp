@@ -195,7 +195,7 @@ Node* declare(Token* tok_type){
     // ecpect lvar identifer
     Token* tok = tk_expect_ident();
     Node* node = (Node*)calloc(1, sizeof(Node));
-    node->kind = ND_LVAR;
+    node->kind = ND_DECLARE;
     
     Ident* ident = id_find_ident(tok);
     if(ident){

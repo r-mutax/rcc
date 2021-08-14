@@ -76,6 +76,7 @@ typedef enum {
     ND_FUNC_CALL,   // func calling
     ND_ADDR,    // *(lval)
     ND_DEREF,   // &(lval)
+    ND_DECLARE, // declare variable
 } NodeKind;
 
 typedef struct Node {

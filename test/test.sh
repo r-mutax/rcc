@@ -18,7 +18,6 @@ assert(){
 }
 
 assert 1 'int main(){int a[10]; return 1;}'
-assert 1 'int main() { int x;x=1; sizeof(x=2); return x; }'
 assert 3 'int main() {int* p; tmalloc(&p); int* q; q = p + 3; return q - p;}'
 assert 2 'int main() {int* p; tmalloc(&p); int* q; q = p + 1;return *q;}'
 assert 18 'int main(){return foo() + 4;}'
@@ -40,4 +39,6 @@ assert 2 'int main(){int a; int b;a = 0;b = 0;for(a = 1;a < 3; a = a + 1){b = b 
 assert 25 'int add2(int a,int b){return a + b;} int main(){return add2(10,15);}'
 assert 3 'int main(){int a; int b;a = 3; b = &a; return *b;}'
 assert 8 'int main(){int a; return sizeof(a);}'
+assert 1 'int main() { int x;x=1; sizeof(x=2); return x; }'
+
 echo OK
