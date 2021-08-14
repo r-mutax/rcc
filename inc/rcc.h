@@ -38,7 +38,8 @@ typedef struct Token {
 
 typedef enum {
     TYPE_INT,
-    TYPE_POINTER
+    TYPE_POINTER,
+    TYPE_ARRAY
 } TypeKind;
 
 typedef struct Type{
@@ -46,7 +47,9 @@ typedef struct Type{
     TypeKind    kind;
     Type*       pointer_to;
     Type*       pointer_from;
+    Type*       array_of;
     int         size;
+    int         array_size;
     Type*       next;
 } Type;
 

@@ -32,6 +32,18 @@ Type* ty_pointer_to(Type* base_type)
     return type;
 }
 
+Type* ty_array_of(Type* base_type, int array_size)
+{
+    Type* type = (Type*) calloc(1, sizeof(Type));
+
+    type->kind = TYPE_ARRAY;
+    type->array_of = base_type;
+    type->size = base_type->size;
+    type->array_size = array_size;
+
+    return type;
+}
+
 Type* ty_get_type(const char* c, int len)
 {
     for(Type* ty = type_dict.next; ty; ty = ty->next)

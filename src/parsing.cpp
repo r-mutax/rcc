@@ -200,10 +200,22 @@ Node* declare(Token* tok_type){
     Ident* ident = id_find_ident(tok);
     if(ident){
         error_at(tok->str, "'%s' is redifiniton.", ident->name);
-    } else {
-        ident = id_declare_lvar(tok, type);
+    }
+    
+    // if it is array definition.
+    // register array type to typemanager.
+    if(tk_consume("[")){
+        // array definition
+        int array_size = tk_expect_number();
+        tk_expect("]");
+
+        // array type decide.
+        // :: one to one type
+        type = ty_array_of(type, array_size);
     }
 
+    ident = id_declare_lvar(tok, type);
+    
     node->offset = ident->offset;
 
     return node;
