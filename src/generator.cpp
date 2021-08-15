@@ -258,8 +258,7 @@ void gen_lval(Node* node){
             printf("    sub rax, %d\n", node->offset);
             break;
         case ND_DEREF:
-            gen_lval(node->lhs);
-            printf("    mov rax, [rax]\n");
+            gen(node->lhs);
             break;
         default:
             error("This is not address or variable at assignment.");

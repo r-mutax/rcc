@@ -39,15 +39,15 @@ Ident* id_declare_lvar(Token* tok, Type* type){
     // 関数で使用するスタックサイズを増やす
     IdentScope* funcscope = lid_get_func_scope();
 
-    // ident offset is funcscope + 8.
-    ident->offset = funcscope->stacksize + 8;
-
     // Update funcscope.
     if(type->kind == TYPE_ARRAY){
         funcscope->stacksize += type->size * type->array_size;
     } else {
         funcscope->stacksize += type->size;
-    }    
+    }
+
+    // ident offset is funcscope + 8.
+    ident->offset = funcscope->stacksize;    
 
     // 現在のスコープの変数リストに引っ付ける。
     ident->next = sc_cur->idents;

@@ -96,7 +96,11 @@ void ty_add_type(Node* node){
             node->type = ty_get_type("int", 3);
             break;
         case ND_ADDR:
-            node->type = ty_pointer_to(node->lhs->type);
+            if(node->lhs->type->kind == TYPE_ARRAY){
+                node->type = ty_pointer_to(node->lhs->type->array_of);
+            } else {
+                node->type = ty_pointer_to(node->lhs->type);
+            }
             break;
         case ND_DEREF:
             if (node->lhs->type->kind == TYPE_POINTER){
