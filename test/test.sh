@@ -17,6 +17,8 @@ assert(){
     fi
 }
 
+assert 123 'int main(){int a[10]; a[0] = 3; a[1] = 4; a[1+2*2] = 123; return a[5];}'
+assert 4 'int main(){int a[10]; a[0] = 3; a[1] = 4; return a[1];}'
 assert 4 'int main(){int a[10]; *a = 3; *(a + 1) = 4; return *(a + 1);}'
 assert 3 'int main() {int* p; tmalloc(&p); int* q; q = p + 3; return q - p;}'
 assert 2 'int main() {int* p; tmalloc(&p); int* q; q = p + 1;return *q;}'

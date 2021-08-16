@@ -368,10 +368,25 @@ Node* primary(){
         node->kind = ND_LVAR;
 
         Ident* ident = id_find_ident(tok);
-
+        
         if(ident){
             node->offset = ident->offset;
             node->type = ident->type;
+
+            // consume "[", then this ident is array-name.
+            if(tk_consume("[")){
+                if(ident->type->kind == TYPE_POINTER || ident->type->kind == TYPE_ARRAY){
+
+                    // array index.
+                    Node* idx_node = expr();
+                    Node* node_deref = new_node(ND_DEREF, new_add(node, idx_node), NULL);
+                  
+                    tk_expect("]");
+                    return node_deref;
+                }
+                error("error");
+            }
+
         } else {
             char* ident_name = (char*) calloc(1, tok->len);
             memcpy(ident_name, tok->str, tok->len);
