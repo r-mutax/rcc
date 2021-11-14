@@ -1,19 +1,28 @@
 #include "typemgr.h"
 
 Type*           cur_type;
-Type           type_dict;
+Type            type_dict;
+Type*           type_tail = &type_dict;
 
 #define TYPE_NAME_INT   "int"
 
 void ty_init(){
 
-    Type*   int_type = (Type*)calloc(1, sizeof(Type));
+    // Provisional processing
+    ty_add_type("int", 8, TYPE_INTEGER);
+    ty_add_type("long", 8, TYPE_INTEGER);
+}
 
-    int_type->kind = TYPE_INT;
-    int_type->type_name = TYPE_NAME_INT;
-    int_type->size = 8;
+void ty_add_type(const char* type_name, size_t size, TypeKind kind)
+{
+    Type* ty = (Type*) calloc(1, sizeof(Type));
 
-    type_dict.next = int_type;
+    ty->kind = kind;
+    ty->type_name = type_name;
+    ty->size = size;
+
+    type_tail->next = ty;
+    type_tail = ty;
 }
 
 Type* ty_pointer_to(Type* base_type)

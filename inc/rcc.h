@@ -37,7 +37,7 @@ typedef struct Token {
 // ===============================
 
 typedef enum {
-    TYPE_INT,
+    TYPE_INTEGER,
     TYPE_POINTER,
     TYPE_ARRAY
 } TypeKind;
