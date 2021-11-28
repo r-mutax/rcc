@@ -171,7 +171,9 @@ void gen(Node* node){
             // gen_lval() -> stored variable address to rax register.
             // then, load [rax] to rax register.
             gen_lval(node);
-            printf("    mov rax, [rax]\n");
+            if(node->type->kind != TYPE_ARRAY){
+                printf("    mov rax, [rax]\n");
+            }
             return;
         case ND_ASSIGN:
             // gen_lval() -> stored variable address to rax register.
@@ -254,8 +256,7 @@ void gen_lval(Node* node){
 
     switch(node->kind){
         case ND_LVAR:
-            printf("    mov rax, rbp\n");
-            printf("    sub rax, %d\n", node->offset);
+            printf("    lea rax, [rbp-%d]\n", node->offset);
             break;
         case ND_DEREF:
             gen(node->lhs);

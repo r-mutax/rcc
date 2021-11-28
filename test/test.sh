@@ -17,6 +17,7 @@ assert(){
     fi
 }
 
+assert 3 'int main(){int p[3]; p[0] = 3; p[1] = 2; int *q; q = p + 1; return p[0];}'
 assert 123 'int main(){int a[10]; a[0] = 3; a[1] = 4; a[1+2*2] = 123; return a[5];}'
 assert 4 'int main(){int a[10]; a[0] = 3; a[1] = 4; return a[1];}'
 assert 4 'int main(){int a[10]; *a = 3; *(a + 1) = 4; return *(a + 1);}'
